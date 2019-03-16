@@ -1,14 +1,31 @@
 version: '3'
 
 services:
-  db:
-    image: postgres
+  nginx:
+    image: nginx
+    container_name: nginx1
+    ports:
+      - "80:8000"
+    volumes:
+      - ./config/nginx:/etc/nginx/conf.d
+      - ./static:/static
+    depends_on:
+      - web
     restart: always
+
   web:
     image: raffrearaus/capsutesting
-    command: python manage.py runserver 0.0.0.0:8000
-    ports:
-      - "8000:8000"
+    container_name: django1
+    command: bash -c "python manage.py collectstatic --no-input && python manage.py makemigrations && python manage.py migrate && gunicorn capsulefyweb.wsgi -b 0.0.0.0:8000 --workers 3"
+    expose:
+      - "8000"
     depends_on:
       - db
+    volumes:
+      - ./static:/code/static
+    restart: always
+
+  db:
+    image: postgres
+    container_name: psql1
     restart: always
