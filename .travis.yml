@@ -16,6 +16,7 @@ after_success:
 - docker build . --tag raffrearaus/capsutesting
 - docker push raffrearaus/capsutesting
 - cd ..
+- chmod 400 aws-capsutesting.pem
 - ssh -o "StrictHostKeyChecking no" -i aws-capsutesting.pem ec2-34-233-121-249.compute-1.amazonaws.com
 - cd capsutesting
 - docker-compose pull
