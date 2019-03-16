@@ -1,15 +1,22 @@
 language: python
 python:
-  - 3.6.6
+- 3.6.6
 services:
-  - docker
+- docker
 before_install:
-  - cd capsulefyweb
+- openssl aes-256-cbc -K $encrypted_d1eb42c1423f_key -iv $encrypted_d1eb42c1423f_iv
+  -in aws-capsutesting.pem.enc -out aws-capsutesting.pem -d
+- cd capsulefyweb
 install:
-  - pip install -r requirements.txt
+- pip install -r requirements.txt
 script:
-  - python manage.py test
+- python manage.py test
 after_success:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-  - docker build . --tag raffrearaus/capsutesting
-  - docker push raffrearaus/capsutesting
+- echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+- docker build . --tag $raffrearaus/capsutesting
+- docker push raffrearaus/capsutesting
+- ssh -i aws-capsutesting.pem ec2-34-233-121-249.compute-1.amazonaws.com
+- cd capsutesting
+- docker-compose pull
+- docker-compose up -d
+- exit
